@@ -10,7 +10,7 @@ st.markdown("""
     /* 1. タイトル (h1) のサイズを強制的に小さくする */
     h1 {
         font-size: 1.5rem !important;  /* さらに小さく 1.5rem に設定 */
-        padding-top: 1.0rem !important;
+        padding-top: 1.5rem !important;
         padding-bottom: 0.5rem !important;
     }
     
