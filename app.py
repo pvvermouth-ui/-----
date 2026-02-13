@@ -121,46 +121,49 @@ if st.button("プロンプトを生成する"):
 
         st.success("プロンプトが完成しました！")
 
-        # 1. コピー用の隠しテキストエリア（コピー操作用）
-        st.text_area("プロンプト内容（念のための中身確認用）", full_prompt, height=200)
-
-        # 2. 【超目立つ】コピー＆Gemini起動ボタン（カスタムHTML）
-        # スマホで「コピーしました」と通知が出て、そのままGeminiへ飛ばす仕組み
+        # 1. 【コピー機能】JavaScriptでクリップボードにコピー
+        # ボタンを押さずとも、生成された瞬間にコピーボタンを表示
         import urllib.parse
-        encoded_prompt = urllib.parse.quote(full_prompt)
         
-        # Googleのユニバーサルリンク形式（アプリ優先起動）
-        gemini_link = "https://gemini.google.com/app"
-
-        html_button = f"""
-            <div style="text-align: center; margin: 20px 0;">
+        # クリップボードコピー用のHTML/JS
+        # ボタンを「コピーしました」に変化させる演出付き
+        copy_html = f"""
+            <div style="text-align: center;">
                 <button id="copy-btn" style="
-                    background-color: #1a73e8;
-                    color: white;
-                    border: none;
-                    padding: 15px 30px;
-                    font-size: 1.2rem;
-                    font-weight: bold;
-                    border-radius: 50px;
+                    background-color: #f0f2f6;
+                    color: #31333f;
+                    border: 1px solid #dcdfe6;
+                    padding: 10px 20px;
+                    font-size: 1rem;
+                    border-radius: 10px;
                     width: 100%;
-                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                     cursor: pointer;
+                    margin-bottom: 10px;
                 ">
-                    📋 プロンプトをコピーしてGeminiを起動
+                    📋 プロンプトをコピーする
                 </button>
             </div>
-
             <script>
             const btn = document.getElementById('copy-btn');
             btn.addEventListener('click', function() {{
                 const text = `{full_prompt.replace("`", "\\`").replace("${", "\\${")}`;
                 navigator.clipboard.writeText(text).then(function() {{
-                    alert('コピーしました！Geminiが開きます。貼り付けて送信してください。');
-                    window.location.href = '{gemini_link}';
+                    btn.innerText = '✅ コピー完了！';
+                    btn.style.backgroundColor = '#e1ff8d';
                 }});
             }});
             </script>
         """
-        st.components.v1.html(html_button, height=120)
+        st.components.v1.html(copy_html, height=70)
 
-        st.warning("⚠️ アプリが開かない場合：ブラウザで開いた後、入力欄を長押しして『貼り付け』てください。")
+        # 2. 【移動機能】Streamlit公式のリンクボタン（これが一番確実）
+        # Androidアプリを確実に呼び出すための公式URL
+        gemini_url = "https://gemini.google.com/app"
+        
+        st.link_button("Geminiを起動する", gemini_url, use_container_width=True, type="primary")
+
+        st.info("💡 手順: ①上のグレーのボタンでコピー ②青いボタンでGeminiへ移動 ③貼り付けて送信")
+        
+        # 3. 念のためのテキストエリア
+        with st.expander("コピーがうまくいかない場合はこちらから手動コピー"):
+            st.text_area("プロンプト全文", full_prompt, height=300)
