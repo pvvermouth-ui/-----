@@ -126,9 +126,7 @@ if st.button("プロンプトを生成する"):
 
         st.success("プロンプトが完成しました！")
 
-        # 1. 【iOS対応】コピー機能
-        # iPhoneのSafariは navigator.clipboard が厳しいため、
-        # 確実に動作する「一瞬だけテキストエリアを作ってコピーする」伝統的な方法も混ぜます。
+        # --- 1. 共通のコピーボタン（今のJavaScript版が一番確実） ---
         copy_html = f"""
             <div style="text-align: center;">
                 <button id="copy-btn" style="
@@ -142,36 +140,44 @@ if st.button("プロンプトを生成する"):
                     cursor: pointer;
                     margin-bottom: 12px;
                     font-weight: bold;
-                    -webkit-tap-highlight-color: transparent;
                 ">
-                    プロンプトをコピーする
+                    ① プロンプトをコピーする
                 </button>
             </div>
             <script>
             const btn = document.getElementById('copy-btn');
             btn.addEventListener('click', function() {{
                 const text = `{full_prompt.replace("`", "\\`").replace("${", "\\${")}`;
-                
-                // iOS/Safari向けの確実なコピー処理
-                const textArea = document.createElement("textarea");
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {{
-                    document.execCommand('copy');
+                navigator.clipboard.writeText(text).then(function() {{
                     btn.innerText = '✅ コピー完了！';
                     btn.style.backgroundColor = '#e1ff8d';
-                }} catch (err) {{
-                    console.error('Copy failed', err);
-                }}
-                document.body.removeChild(textArea);
+                }});
             }});
             </script>
         """
         st.components.v1.html(copy_html, height=85)
 
-        # 2. 【iOS/Android共通】Gemini起動ボタン
-        # iOSの場合、このリンクを踏むとGeminiアプリがあれば「開きますか？」とダイアログが出ることが多いです
+        # --- 2. Windowsとスマホで「開くボタン」を使い分ける ---
         gemini_url = "https://gemini.google.com/app"
-        
-        st.link_button("Geminiを開く", gemini_url, use_container_width=True, type="primary")
+
+        # Windows/PC用の「別ウィンドウで開く」ボタン
+        # スマホでは普通のボタンとして機能し、PCではポップアップになります
+        window_open_js = f"""
+            <div style="text-align: center;">
+                <button onclick="window.open('{gemini_url}', 'gemini_window', 'width=1200,height=900,menubar=no,toolbar=no,location=no');" style="
+                    background-color: #1a73e8;
+                    color: white;
+                    border: none;
+                    padding: 15px 30px;
+                    font-size: 1.1rem;
+                    font-weight: bold;
+                    border-radius: 12px;
+                    width: 100%;
+                    cursor: pointer;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                ">
+                    ② Geminiを起動
+                </button>
+            </div>
+        """
+        st.components.v1.html(window_open_js, height=80)
