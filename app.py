@@ -121,14 +121,46 @@ if st.button("プロンプトを生成する"):
 
         st.success("プロンプトが完成しました！")
 
-        # 1. コピーボタンの設置 (Streamlitの標準機能)
-        st.code(full_prompt, language="text") 
-        # ↑ st.codeを使うと、右上に自動で「コピーボタン」が表示されます。
+        # 1. コピー用の隠しテキストエリア（コピー操作用）
+        st.text_area("プロンプト内容（念のための中身確認用）", full_prompt, height=200)
 
-        # 2. Geminiアプリを開くためのリンク
-        # iOS/Android共通のディープリンク形式に変更します
-        gemini_app_url = "https://gemini.google.com/app"
+        # 2. 【超目立つ】コピー＆Gemini起動ボタン（カスタムHTML）
+        # スマホで「コピーしました」と通知が出て、そのままGeminiへ飛ばす仕組み
+        import urllib.parse
+        encoded_prompt = urllib.parse.quote(full_prompt)
         
-        st.link_button("Geminiアプリ/ブラウザで開く", gemini_app_url, use_container_width=True)
+        # Googleのユニバーサルリンク形式（アプリ優先起動）
+        gemini_link = "https://gemini.google.com/app"
 
-        st.info("💡 スマホの場合：上のリンクを押すとGeminiアプリがインストールされていれば自動で開くことが多いです。開かない場合は、コード欄右上のボタンでコピーして、手動でアプリに貼り付けてください。")
+        html_button = f"""
+            <div style="text-align: center; margin: 20px 0;">
+                <button id="copy-btn" style="
+                    background-color: #1a73e8;
+                    color: white;
+                    border: none;
+                    padding: 15px 30px;
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                    border-radius: 50px;
+                    width: 100%;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    cursor: pointer;
+                ">
+                    📋 プロンプトをコピーしてGeminiを起動
+                </button>
+            </div>
+
+            <script>
+            const btn = document.getElementById('copy-btn');
+            btn.addEventListener('click', function() {{
+                const text = `{full_prompt.replace("`", "\\`").replace("${", "\\${")}`;
+                navigator.clipboard.writeText(text).then(function() {{
+                    alert('コピーしました！Geminiが開きます。貼り付けて送信してください。');
+                    window.location.href = '{gemini_link}';
+                }});
+            }});
+            </script>
+        """
+        st.components.v1.html(html_button, height=120)
+
+        st.warning("⚠️ アプリが開かない場合：ブラウザで開いた後、入力欄を長押しして『貼り付け』てください。")
