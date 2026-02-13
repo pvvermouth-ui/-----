@@ -126,7 +126,9 @@ if st.button("プロンプトを生成する"):
 
         st.success("プロンプトが完成しました！")
 
-        # 1. 【コピー機能】（ここは今のまま、確実に機能します）
+        # 1. 【iOS対応】コピー機能
+        # iPhoneのSafariは navigator.clipboard が厳しいため、
+        # 確実に動作する「一瞬だけテキストエリアを作ってコピーする」伝統的な方法も混ぜます。
         copy_html = f"""
             <div style="text-align: center;">
                 <button id="copy-btn" style="
@@ -135,11 +137,12 @@ if st.button("プロンプトを生成する"):
                     border: 1px solid #dcdfe6;
                     padding: 15px 20px;
                     font-size: 1.1rem;
-                    border-radius: 10px;
+                    border-radius: 12px;
                     width: 100%;
                     cursor: pointer;
-                    margin-bottom: 10px;
+                    margin-bottom: 12px;
                     font-weight: bold;
+                    -webkit-tap-highlight-color: transparent;
                 ">
                     プロンプトをコピーする
                 </button>
@@ -148,17 +151,27 @@ if st.button("プロンプトを生成する"):
             const btn = document.getElementById('copy-btn');
             btn.addEventListener('click', function() {{
                 const text = `{full_prompt.replace("`", "\\`").replace("${", "\\${")}`;
-                navigator.clipboard.writeText(text).then(function() {{
+                
+                // iOS/Safari向けの確実なコピー処理
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {{
+                    document.execCommand('copy');
                     btn.innerText = '✅ コピー完了！';
                     btn.style.backgroundColor = '#e1ff8d';
-                }});
+                }} catch (err) {{
+                    console.error('Copy failed', err);
+                }}
+                document.body.removeChild(textArea);
             }});
             </script>
         """
         st.components.v1.html(copy_html, height=85)
 
-        # 2. 【移動機能】Androidで最も安定する公式URL
-        # intentではなく、あえて通常のURLに戻します（Playストア飛ばしを避けるため）
-        gemini_url = "https://gemini.google.com/"
+        # 2. 【iOS/Android共通】Gemini起動ボタン
+        # iOSの場合、このリンクを踏むとGeminiアプリがあれば「開きますか？」とダイアログが出ることが多いです
+        gemini_url = "https://gemini.google.com/app"
         
         st.link_button("Geminiを開く", gemini_url, use_container_width=True, type="primary")
