@@ -4,21 +4,26 @@ import streamlit as st
 st.set_page_config(page_title="論文検索プロンプト生成", page_icon="📄")
 
 # --- カスタムCSSで文字サイズを調整 ---
+# --- カスタムCSSで文字サイズを確実に調整 ---
 st.markdown("""
     <style>
-    /* タイトルのサイズ */
-    .stTitle {
-        font-size: 1.2rem !important;
-        padding-top: 1rem;
+    /* 1. タイトル (h1) のサイズを強制的に小さくする */
+    h1 {
+        font-size: 1.5rem !important;  /* さらに小さく 1.5rem に設定 */
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
     }
-    /* サブヘッダー（st.subheader）のサイズ */
-    .st-emotion-cache-k77z8u, h3 {
-        font-size: 1.2rem !important;
-        margin-bottom: 0.5rem;
+    
+    /* 2. サブヘッダー (h3) のサイズ */
+    h3 {
+        font-size: 1.1rem !important;
+        margin-top: 1rem !important;
+        margin-bottom: 0.5rem !important;
     }
-    /* 全体の余白を少し詰める */
+
+    /* 3. 全体の余白（トップ）を詰めて画面を広く使う */
     .block-container {
-        padding-top: 2rem;
+        padding-top: 1.5rem !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -136,7 +141,7 @@ if st.button("プロンプトを生成する"):
                     margin-bottom: 10px;
                     font-weight: bold;
                 ">
-                    ① プロンプトをコピーする
+                    プロンプトをコピーする
                 </button>
             </div>
             <script>
@@ -156,6 +161,4 @@ if st.button("プロンプトを生成する"):
         # intentではなく、あえて通常のURLに戻します（Playストア飛ばしを避けるため）
         gemini_url = "https://gemini.google.com/"
         
-        st.link_button("② Geminiを開く", gemini_url, use_container_width=True, type="primary")
-
-        st.info("💡 **Androidでアプリが開かない場合**：\\n②を**長押し**して「**外部ブラウザ（またはアプリ）で開く**」を選択してください。")
+        st.link_button("Geminiを開く", gemini_url, use_container_width=True, type="primary")
