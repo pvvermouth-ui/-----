@@ -121,7 +121,7 @@ if st.button("プロンプトを生成する"):
 
         st.success("プロンプトが完成しました！")
 
-        # 1. 【コピー機能】（ここはそのまま、確実に機能します）
+        # 1. 【コピー機能】（ここは今のまま、確実に機能します）
         copy_html = f"""
             <div style="text-align: center;">
                 <button id="copy-btn" style="
@@ -144,7 +144,7 @@ if st.button("プロンプトを生成する"):
             btn.addEventListener('click', function() {{
                 const text = `{full_prompt.replace("`", "\\`").replace("${", "\\${")}`;
                 navigator.clipboard.writeText(text).then(function() {{
-                    btn.innerText = '✅ コピーしました！';
+                    btn.innerText = '✅ コピー完了！';
                     btn.style.backgroundColor = '#e1ff8d';
                 }});
             }});
@@ -152,10 +152,10 @@ if st.button("プロンプトを生成する"):
         """
         st.components.v1.html(copy_html, height=85)
 
-        # 2. 【移動機能】Androidのインテント（強制アプリ起動）URL
-        # 通常のURLではなく、Androidに「Geminiアプリを起動せよ」と直接命令する形式です
-        intent_url = "intent://gemini.google.com/app#Intent;package=com.google.android.apps.bard;scheme=https;end;"
+        # 2. 【移動機能】Androidで最も安定する公式URL
+        # intentではなく、あえて通常のURLに戻します（Playストア飛ばしを避けるため）
+        gemini_url = "https://gemini.google.com/"
         
-        st.link_button("② Geminiを起動する", intent_url, use_container_width=True, type="primary")
+        st.link_button("② Geminiを開く", gemini_url, use_container_width=True, type="primary")
 
-        st.info("💡 手順: ①でコピー → ②で起動 → 入力欄を長押しして『貼り付け』")
+        st.info("💡 **Androidでアプリが開かない場合**：\\n②を**長押し**して「**外部ブラウザ（またはアプリ）で開く**」を選択してください。")
