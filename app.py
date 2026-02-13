@@ -121,26 +121,22 @@ if st.button("プロンプトを生成する"):
 
         st.success("プロンプトが完成しました！")
 
-        # 1. 【コピー機能】JavaScriptでクリップボードにコピー
-        # ボタンを押さずとも、生成された瞬間にコピーボタンを表示
-        import urllib.parse
-        
-        # クリップボードコピー用のHTML/JS
-        # ボタンを「コピーしました」に変化させる演出付き
+        # 1. 【コピー機能】（ここはそのまま、確実に機能します）
         copy_html = f"""
             <div style="text-align: center;">
                 <button id="copy-btn" style="
                     background-color: #f0f2f6;
                     color: #31333f;
                     border: 1px solid #dcdfe6;
-                    padding: 10px 20px;
-                    font-size: 1rem;
+                    padding: 15px 20px;
+                    font-size: 1.1rem;
                     border-radius: 10px;
                     width: 100%;
                     cursor: pointer;
                     margin-bottom: 10px;
+                    font-weight: bold;
                 ">
-                    📋 プロンプトをコピーする
+                    ① プロンプトをコピーする
                 </button>
             </div>
             <script>
@@ -148,22 +144,18 @@ if st.button("プロンプトを生成する"):
             btn.addEventListener('click', function() {{
                 const text = `{full_prompt.replace("`", "\\`").replace("${", "\\${")}`;
                 navigator.clipboard.writeText(text).then(function() {{
-                    btn.innerText = '✅ コピー完了！';
+                    btn.innerText = '✅ コピーしました！';
                     btn.style.backgroundColor = '#e1ff8d';
                 }});
             }});
             </script>
         """
-        st.components.v1.html(copy_html, height=70)
+        st.components.v1.html(copy_html, height=85)
 
-        # 2. 【移動機能】Streamlit公式のリンクボタン（これが一番確実）
-        # Androidアプリを確実に呼び出すための公式URL
-        gemini_url = "https://gemini.google.com/app"
+        # 2. 【移動機能】Androidのインテント（強制アプリ起動）URL
+        # 通常のURLではなく、Androidに「Geminiアプリを起動せよ」と直接命令する形式です
+        intent_url = "intent://gemini.google.com/app#Intent;package=com.google.android.apps.bard;scheme=https;end;"
         
-        st.link_button("Geminiを起動する", gemini_url, use_container_width=True, type="primary")
+        st.link_button("② Geminiを起動する", intent_url, use_container_width=True, type="primary")
 
-        st.info("💡 手順: ①上のグレーのボタンでコピー ②青いボタンでGeminiへ移動 ③貼り付けて送信")
-        
-        # 3. 念のためのテキストエリア
-        with st.expander("コピーがうまくいかない場合はこちらから手動コピー"):
-            st.text_area("プロンプト全文", full_prompt, height=300)
+        st.info("💡 手順: ①でコピー → ②で起動 → 入力欄を長押しして『貼り付け』")
