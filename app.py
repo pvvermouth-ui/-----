@@ -120,5 +120,15 @@ if st.button("プロンプトを生成する"):
 - 専門用語はリハビリ職が理解できる適切な用語を使用してください。"""
 
         st.success("プロンプトが完成しました！")
-        st.text_area("生成されたプロンプト", full_prompt, height=500)
-        st.link_button("Geminiを開いて貼り付ける", "https://gemini.google.com/app")
+
+        # 1. コピーボタンの設置 (Streamlitの標準機能)
+        st.code(full_prompt, language="text") 
+        # ↑ st.codeを使うと、右上に自動で「コピーボタン」が表示されます。
+
+        # 2. Geminiアプリを開くためのリンク
+        # iOS/Android共通のディープリンク形式に変更します
+        gemini_app_url = "https://gemini.google.com/app"
+        
+        st.link_button("Geminiアプリ/ブラウザで開く", gemini_app_url, use_container_width=True)
+
+        st.info("💡 スマホの場合：上のリンクを押すとGeminiアプリがインストールされていれば自動で開くことが多いです。開かない場合は、コード欄右上のボタンでコピーして、手動でアプリに貼り付けてください。")
