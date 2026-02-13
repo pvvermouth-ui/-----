@@ -3,18 +3,62 @@ import streamlit as st
 # ページ設定
 st.set_page_config(page_title="論文検索プロンプト生成", page_icon="📄")
 
-st.title("論文検索プロンプト作成📄")
+# --- カスタムCSSで文字サイズを調整 ---
+st.markdown("""
+    <style>
+    /* タイトルのサイズ */
+    .stTitle {
+        font-size: 1.8rem !important;
+        padding-top: 1rem;
+    }
+    /* サブヘッダー（st.subheader）のサイズ */
+    .st-emotion-cache-k77z8u, h3 {
+        font-size: 1.2rem !important;
+        margin-bottom: 0.5rem;
+    }
+    /* 全体の余白を少し詰める */
+    .block-container {
+        padding-top: 2rem;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+st.title("論文検索プロンプト作成")
 st.caption("AIを用いた論文検索の依頼文を作成します。")
 
 # 入力セクション
 with st.container():
-    # 職種は内部で固定、期間のみ選択
-    period = st.select_slider("検索対象期間", options=["制限なし", "10年以内", "5年以内"], value="5年以内")
+    
+    # --- 検索対象期間のセクション ---
+    st.subheader("📅 検索対象期間")
+
+    # 1. 制限なしのチェックボックス
+    no_limit = st.checkbox("期間制限なし（全期間を対象にする）", value=False)
+
+    # 2. 1年〜20年のスライダー
+    # チェックが入っている場合は disabled=True になり、操作できなくなります
+    period_years = st.select_slider(
+        "検索対象（年）",
+        options=list(range(1, 21)),
+        value=5,
+        disabled=no_limit,
+        help="チェックボックスがオフの時に有効です"
+    )
+
+    # プロンプト用の期間テキストを決定
+    if no_limit:
+        period_text = "制限なし（全期間）"
+    else:
+        period_text = f"過去 {period_years} 年以内"
+
+    # --- プロンプト生成ロジック内の変更 ---
+    # 以前の full_prompt = f""" ... の中の「期間: {period}」を
+    # 「期間: {period_text}」に書き換えてください。
 
     st.subheader("👤 対象者（P）の情報")
     p_disease = st.text_input("疾患名", placeholder="例：脳卒中、大腿骨近位部骨折")
-    p_symptom = st.text_input("主な症状（高次脳機能もここに）", 
-                           placeholder="例：弛緩性麻痺、歩行時の立脚後期での膝折れ左、半側空間無視")
+    p_symptom = st.text_input("主な症状", 
+                           placeholder="例：弛緩性麻痺、歩行時の立脚後期での膝折れ")
     p_severity = st.text_input("重症度（任意）", placeholder="例：SIAS 30点、自立歩行困難、Br.stage III")
 
     st.subheader("💡 介入（I）・アウトカム（O）")
@@ -26,7 +70,7 @@ with st.container():
 
     st.subheader("🔑 自由キーワード（高次脳・合併症など）")
     free_keywords = st.text_input("キーワード", 
-                                placeholder="例：USN、認知負荷、二重課題、糖尿病、バイオメカニクス")
+                                placeholder="例：USN、二重課題、バイオメカニクス")
 
 # プロンプト生成
 if st.button("プロンプトを生成する"):
@@ -60,16 +104,17 @@ if st.button("プロンプトを生成する"):
 - **重要視するキーワード**: {free_keywords if free_keywords else "なし"}
 
 # 検索のこだわり
-- 期間: {period}
+- 期間: {period_text}
 - 言語: 日本語および英語（英語論文は日本語で解説すること）
 - 情報源: PubMed, Cochrane Library, Google Scholar, PEDro等
 - 論文の種類: RCT、メタ分析、システマティックレビュー、または信頼性の高い症例報告
 
 # 出力形式
-1. **タイトル（和訳）**
-2. **要約（PICO形式で）**
-3. **臨床的意義**: 介入の頻度・強度・期間の目安や、現場での具体的な活用法
-4. **エビデンスレベルとURL/DOI**
+1. **タイトル（原題）**
+2. **タイトル（和訳）**
+3. **要約（PICO形式で）**
+4. **臨床的意義**: 介入の頻度・強度・期間の目安や、現場での具体的な活用法
+5. **エビデンスレベルとURL/DOI**
 
 # 制約事項
 - 存在しない架空の論文を絶対に生成しないでください。
