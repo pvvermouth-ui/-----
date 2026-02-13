@@ -8,7 +8,7 @@ st.markdown("""
     <style>
     /* タイトルのサイズ */
     .stTitle {
-        font-size: 1.8rem !important;
+        font-size: 1.5rem !important;
         padding-top: 1rem;
     }
     /* サブヘッダー（st.subheader）のサイズ */
@@ -24,7 +24,6 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 st.title("論文検索プロンプト作成")
-st.caption("AIを用いた論文検索の依頼文を作成します。")
 
 # 入力セクション
 with st.container():
