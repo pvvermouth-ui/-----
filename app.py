@@ -158,27 +158,29 @@ if st.button("プロンプトを生成する"):
         """
         st.components.v1.html(copy_html, height=85)
 
-        # --- 2. Windowsとスマホで「開くボタン」を使い分ける ---
+        # --- Android PWA/ホーム画面追加時でも確実に外部へ飛ばすボタン ---
         gemini_url = "https://gemini.google.com/app"
-
-        # Windows/PC用の「別ウィンドウで開く」ボタン
-        # スマホでは普通のボタンとして機能し、PCではポップアップになります
-        window_open_js = f"""
+        
+        # target="_blank" と rel="noopener noreferrer" を組み合わせることで
+        # PWAの枠から強制的に外（ブラウザやアプリ）へジャンプさせます
+        pwa_fix_html = f"""
             <div style="text-align: center;">
-                <button onclick="window.open('{gemini_url}', 'gemini_window', 'width=1200,height=900,menubar=no,toolbar=no,location=no');" style="
-                    background-color: #1a73e8;
-                    color: white;
-                    border: none;
-                    padding: 15px 30px;
-                    font-size: 1.1rem;
-                    font-weight: bold;
-                    border-radius: 12px;
-                    width: 100%;
-                    cursor: pointer;
-                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                ">
-                    Geminiを起動
-                </button>
+                <a href="{gemini_url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                    <button style="
+                        background-color: #1a73e8;
+                        color: white;
+                        border: none;
+                        padding: 15px 30px;
+                        font-size: 1.1rem;
+                        font-weight: bold;
+                        border-radius: 12px;
+                        width: 100%;
+                        cursor: pointer;
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    ">
+                        Geminiを起動
+                    </button>
+                </a>
             </div>
         """
-        st.components.v1.html(window_open_js, height=80)
+        st.components.v1.html(pwa_fix_html, height=80)
