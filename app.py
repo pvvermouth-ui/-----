@@ -133,7 +133,7 @@ if st.button("プロンプトを生成する"):
                 <button id="copy-btn" style="
                     background-color: #f0f2f6; color: #31333f; border: 1px solid #dcdfe6;
                     padding: 15px; font-size: 1.1rem; border-radius: 12px; width: 100%; font-weight: bold;
-                ">📋 プロンプトをコピーする</button>
+                ">プロンプトをコピーする</button>
             </div>
             <script>
             document.getElementById('copy-btn').addEventListener('click', function() {{
@@ -159,21 +159,26 @@ if st.button("プロンプトを生成する"):
         const url = "{gemini_url}";
 
         if (ua.indexOf('android') > -1) {{
-            // --- Android用: PWAでもブラウザでも「intent」リンクが最強 ---
-            // これでPlayストアに飛ぶ場合は、長押しを推奨するテキストを添える
+            // Google Playに飛ばさず、直接アプリを「叩き起こす」ためのURLスキーム
+            // これがダメなら、通常のhttpsリンクに切り替えるフォールバック（予備）付き
             container.innerHTML = `
-                <a href="intent://gemini.google.com/app#Intent;package=com.google.android.apps.bard;scheme=https;end;" 
+                <a href="googlegemini://app" 
                    style="display:block; background:#1a73e8; color:white; padding:15px; border-radius:12px; text-decoration:none; font-weight:bold;">
-                   ② Geminiアプリを起動 (Android)
+                   Geminiアプリを起動 (Android)
                 </a>
-                <p style="font-size:0.8rem; color:gray; margin-top:5px;">※開かない場合はボタンを長押ししてください</p>
+                <p style="font-size:0.8rem; color:gray; margin-top:5px;">
+                   ※ストアが開く場合は、下のリンクを長押ししてください
+                </p>
+                <a href="https://gemini.google.com/app" target="_blank" style="font-size:0.8rem; color:#1a73e8;">
+                   （予備：ブラウザ版で開く）
+                </a>
             `;
         }} else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1) {{
             // --- iOS用: 通常リンクがユニバーサルリンクとして機能 ---
             container.innerHTML = `
                 <a href="${{url}}" target="_blank" 
                    style="display:block; background:#1a73e8; color:white; padding:15px; border-radius:12px; text-decoration:none; font-weight:bold;">
-                   ② Geminiを起動 (iOS)
+                   Geminiを起動 (iOS)
                 </a>
             `;
         }} else {{
@@ -181,7 +186,7 @@ if st.button("プロンプトを生成する"):
             container.innerHTML = `
                 <button onclick="window.open('${{url}}', '_blank', 'width=1000,height=800');"
                    style="display:block; width:100%; background:#1a73e8; color:white; padding:15px; border-radius:12px; border:none; font-weight:bold; cursor:pointer;">
-                   ② Geminiを別画面で起動 (PC)
+                   Geminiを別画面で起動 (PC)
                 </button>
             `;
         }}
