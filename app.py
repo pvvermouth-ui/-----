@@ -127,13 +127,13 @@ if st.button("プロンプトを生成する"):
 
         st.success("プロンプトが完成しました！")
 
-        # 1. 【共通】コピーボタン（これは全デバイス共通で動作します）
+        # 1. 【共通】コピーボタン
         copy_html = f"""
             <div style="text-align: center; margin-bottom: 20px;">
                 <button id="copy-btn" style="
                     background-color: #f0f2f6; color: #31333f; border: 1px solid #dcdfe6;
                     padding: 15px; font-size: 1.1rem; border-radius: 12px; width: 100%; font-weight: bold;
-                ">プロンプトをコピーする</button>
+                ">① プロンプトをコピーする</button>
             </div>
             <script>
             document.getElementById('copy-btn').addEventListener('click', function() {{
@@ -147,49 +147,22 @@ if st.button("プロンプトを生成する"):
         """
         st.components.v1.html(copy_html, height=80)
 
-        # 2. 【デバイス判定 & ボタン出し分け】
+        # 2. 【共通】最もシンプルな「ブラウザで開く」ボタン
+        # target="_blank" と rel="noopener noreferrer" を使うことで、
+        # PWA環境からも強制的に標準ブラウザの新しいタブを立ち上げます。
         gemini_url = "https://gemini.google.com/app"
-
-        # デバイスごとの最適なリンク形式をJavaScriptで動的に生成
-        device_switch_html = f"""
-        <div id="button-container" style="text-align: center;"></div>
-        <script>
-        const container = document.getElementById('button-container');
-        const ua = navigator.userAgent.toLowerCase();
-        const url = "{gemini_url}";
-
-        if (ua.indexOf('android') > -1) {{
-            // Google Playに飛ばさず、直接アプリを「叩き起こす」ためのURLスキーム
-            // これがダメなら、通常のhttpsリンクに切り替えるフォールバック（予備）付き
-            container.innerHTML = `
-                <a href="googlegemini://app" 
-                   style="display:block; background:#1a73e8; color:white; padding:15px; border-radius:12px; text-decoration:none; font-weight:bold;">
-                   Geminiアプリを起動 (Android)
+        
+        launch_html = f"""
+            <div style="text-align: center;">
+                <a href="{gemini_url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                    <button style="
+                        background-color: #1a73e8; color: white; border: none;
+                        padding: 15px; font-size: 1.1rem; border-radius: 12px; width: 100%;
+                        font-weight: bold; cursor: pointer;
+                    ">
+                        ② Geminiを開く
+                    </button>
                 </a>
-                <p style="font-size:0.8rem; color:gray; margin-top:5px;">
-                   ※ストアが開く場合は、下のリンクを長押ししてください
-                </p>
-                <a href="https://gemini.google.com/app" target="_blank" style="font-size:0.8rem; color:#1a73e8;">
-                   （予備：ブラウザ版で開く）
-                </a>
-            `;
-        }} else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1) {{
-            // --- iOS用: 通常リンクがユニバーサルリンクとして機能 ---
-            container.innerHTML = `
-                <a href="${{url}}" target="_blank" 
-                   style="display:block; background:#1a73e8; color:white; padding:15px; border-radius:12px; text-decoration:none; font-weight:bold;">
-                   Geminiを起動 (iOS)
-                </a>
-            `;
-        }} else {{
-            // --- Windows/PC用: window.open で別窓ポップアップ ---
-            container.innerHTML = `
-                <button onclick="window.open('${{url}}', '_blank', 'width=1000,height=800');"
-                   style="display:block; width:100%; background:#1a73e8; color:white; padding:15px; border-radius:12px; border:none; font-weight:bold; cursor:pointer;">
-                   Geminiを別画面で起動 (PC)
-                </button>
-            `;
-        }}
-        </script>
+            </div>
         """
-        st.components.v1.html(device_switch_html, height=120)
+        st.components.v1.html(launch_html, height=80)
