@@ -128,12 +128,13 @@ if st.button("プロンプトを生成する"):
         st.success("プロンプトが完成しました！")
 
         # 1. 【共通】コピーボタン
+        # （ここは今のまま。確実に動作し、完了後に色が変わるので安心感があります）
         copy_html = f"""
             <div style="text-align: center; margin-bottom: 20px;">
                 <button id="copy-btn" style="
                     background-color: #f0f2f6; color: #31333f; border: 1px solid #dcdfe6;
                     padding: 15px; font-size: 1.1rem; border-radius: 12px; width: 100%; font-weight: bold;
-                ">① プロンプトをコピーする</button>
+                ">プロンプトをコピーする</button>
             </div>
             <script>
             document.getElementById('copy-btn').addEventListener('click', function() {{
@@ -147,22 +148,27 @@ if st.button("プロンプトを生成する"):
         """
         st.components.v1.html(copy_html, height=80)
 
-        # 2. 【共通】最もシンプルな「ブラウザで開く」ボタン
-        # target="_blank" と rel="noopener noreferrer" を使うことで、
-        # PWA環境からも強制的に標準ブラウザの新しいタブを立ち上げます。
-        gemini_url = "https://gemini.google.com/app"
+        # 2. 【Android PWA対策の決定版】
+        # ボタンがダメなら、「カード」として情報を提示し、
+        # ユーザーが「自発的に」ブラウザを叩き起こすように誘導します。
         
-        launch_html = f"""
-            <div style="text-align: center;">
-                <a href="{gemini_url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
-                    <button style="
-                        background-color: #1a73e8; color: white; border: none;
-                        padding: 15px; font-size: 1.1rem; border-radius: 12px; width: 100%;
-                        font-weight: bold; cursor: pointer;
-                    ">
-                        ② Geminiを開く
-                    </button>
-                </a>
+        st.markdown(f"""
+            <div style="background-color: #f8f9fa; border: 2px dashed #1a73e8; padding: 15px; border-radius: 12px; text-align: center;">
+                <p style="margin: 0; font-size: 0.9rem; color: #555;">② 下のリンクを<b>【長押し】</b>してください</p>
+                <a href="https://gemini.google.com/app" target="_blank" style="
+                    display: inline-block;
+                    margin-top: 10px;
+                    color: #1a73e8;
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                    word-break: break-all;
+                ">https://gemini.google.com/app</a>
+                <p style="margin-top: 10px; font-size: 0.8rem; color: #1a73e8;">
+                    <b>長押し ➜「外部ブラウザで開く」</b>を選択すると<br>確実にアプリまたはブラウザで開けます。
+                </p>
             </div>
-        """
-        st.components.v1.html(launch_html, height=80)
+        """, unsafe_allow_html=True)
+
+        # 3. PCユーザー向けには、サイドバーや画面下部に「こっそり」ボタンを置いておく
+        with st.expander("PC（Windows）でご利用の方はこちら"):
+            st.link_button("Geminiを別タブで開く", "https://gemini.google.com/app", use_container_width=True)
