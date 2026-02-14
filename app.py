@@ -160,47 +160,29 @@ if st.button("プロンプトを生成する"):
 
         # --- Android PWA/ホーム画面追加時でも確実に外部へ飛ばすボタン ---
         # --- 最終解決：デバイス別・最強の起動ボタン ---
+        # --- Android PWA 突破用：純粋なHTMLリンクボタン ---
         gemini_url = "https://gemini.google.com/app"
         
-        launch_js = f"""
+        # JavaScriptを一切使わず、<a>タグの基本機能だけで飛ばします。
+        # target="_system" や target="_blank" はPWA脱出のトリガーになります。
+        pwa_escape_html = f"""
             <div style="text-align: center;">
-                <button id="launch-btn" style="
+                <a href="{gemini_url}" target="_blank" rel="noopener noreferrer" 
+                   style="
+                    display: block;
                     background-color: #1a73e8;
                     color: white;
-                    border: none;
+                    text-decoration: none;
                     padding: 15px 30px;
                     font-size: 1.1rem;
                     font-weight: bold;
                     border-radius: 12px;
-                    width: 100%;
-                    cursor: pointer;
                     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                ">
-                    Geminiを起動
-                </button>
+                    cursor: pointer;
+                    -webkit-appearance: none;
+                   ">
+                    ② Geminiを起動
+                </a>
             </div>
-
-            <script>
-            document.getElementById('launch-btn').addEventListener('click', function() {{
-                const url = '{gemini_url}';
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                
-                if (isMobile) {{
-                    // スマホ（PWA含む）: 
-                    // 通常の遷移では閉じ込められるため、一時的なリンクを生成して「強制的な外部遷移」を狙う
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.target = '_blank';
-                    a.rel = 'noopener noreferrer';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                }} else {{
-                    // Windows/PC: 
-                    // セキュリティ警告を避けつつ、別ウィンドウで立ち上げる
-                    window.open(url, '_blank', 'width=1200,height=900,menubar=no,toolbar=no,location=no');
-                }}
-            }});
-            </script>
         """
-        st.components.v1.html(launch_js, height=80)
+        st.components.v1.html(pwa_escape_html, height=80)
