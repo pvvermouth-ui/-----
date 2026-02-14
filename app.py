@@ -127,62 +127,64 @@ if st.button("プロンプトを生成する"):
 
         st.success("プロンプトが完成しました！")
 
-        # --- 1. 共通のコピーボタン（今のJavaScript版が一番確実） ---
+        # 1. 【共通】コピーボタン（これは全デバイス共通で動作します）
         copy_html = f"""
-            <div style="text-align: center;">
+            <div style="text-align: center; margin-bottom: 20px;">
                 <button id="copy-btn" style="
-                    background-color: #f0f2f6;
-                    color: #31333f;
-                    border: 1px solid #dcdfe6;
-                    padding: 15px 20px;
-                    font-size: 1.1rem;
-                    border-radius: 12px;
-                    width: 100%;
-                    cursor: pointer;
-                    margin-bottom: 12px;
-                    font-weight: bold;
-                ">
-                    プロンプトをコピーする
-                </button>
+                    background-color: #f0f2f6; color: #31333f; border: 1px solid #dcdfe6;
+                    padding: 15px; font-size: 1.1rem; border-radius: 12px; width: 100%; font-weight: bold;
+                ">📋 プロンプトをコピーする</button>
             </div>
             <script>
-            const btn = document.getElementById('copy-btn');
-            btn.addEventListener('click', function() {{
+            document.getElementById('copy-btn').addEventListener('click', function() {{
                 const text = `{full_prompt.replace("`", "\\`").replace("${", "\\${")}`;
-                navigator.clipboard.writeText(text).then(function() {{
-                    btn.innerText = '✅ コピー完了！';
-                    btn.style.backgroundColor = '#e1ff8d';
+                navigator.clipboard.writeText(text).then(() => {{
+                    this.innerText = '✅ コピー完了！';
+                    this.style.backgroundColor = '#e1ff8d';
                 }});
             }});
             </script>
         """
-        st.components.v1.html(copy_html, height=85)
+        st.components.v1.html(copy_html, height=80)
 
-        # --- Android PWA/ホーム画面追加時でも確実に外部へ飛ばすボタン ---
-        # --- 最終解決：デバイス別・最強の起動ボタン ---
-        # --- Android PWA 突破用：純粋なHTMLリンクボタン ---
+        # 2. 【デバイス判定 & ボタン出し分け】
         gemini_url = "https://gemini.google.com/app"
-        
-        # JavaScriptを一切使わず、<a>タグの基本機能だけで飛ばします。
-        # target="_system" や target="_blank" はPWA脱出のトリガーになります。
-        pwa_escape_html = f"""
-            <div style="text-align: center;">
-                <a href="{gemini_url}" target="_blank" rel="noopener noreferrer" 
-                   style="
-                    display: block;
-                    background-color: #1a73e8;
-                    color: white;
-                    text-decoration: none;
-                    padding: 15px 30px;
-                    font-size: 1.1rem;
-                    font-weight: bold;
-                    border-radius: 12px;
-                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                    cursor: pointer;
-                    -webkit-appearance: none;
-                   ">
-                    ② Geminiを起動
+
+        # デバイスごとの最適なリンク形式をJavaScriptで動的に生成
+        device_switch_html = f"""
+        <div id="button-container" style="text-align: center;"></div>
+        <script>
+        const container = document.getElementById('button-container');
+        const ua = navigator.userAgent.toLowerCase();
+        const url = "{gemini_url}";
+
+        if (ua.indexOf('android') > -1) {{
+            // --- Android用: PWAでもブラウザでも「intent」リンクが最強 ---
+            // これでPlayストアに飛ぶ場合は、長押しを推奨するテキストを添える
+            container.innerHTML = `
+                <a href="intent://gemini.google.com/app#Intent;package=com.google.android.apps.bard;scheme=https;end;" 
+                   style="display:block; background:#1a73e8; color:white; padding:15px; border-radius:12px; text-decoration:none; font-weight:bold;">
+                   ② Geminiアプリを起動 (Android)
                 </a>
-            </div>
+                <p style="font-size:0.8rem; color:gray; margin-top:5px;">※開かない場合はボタンを長押ししてください</p>
+            `;
+        }} else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1) {{
+            // --- iOS用: 通常リンクがユニバーサルリンクとして機能 ---
+            container.innerHTML = `
+                <a href="${{url}}" target="_blank" 
+                   style="display:block; background:#1a73e8; color:white; padding:15px; border-radius:12px; text-decoration:none; font-weight:bold;">
+                   ② Geminiを起動 (iOS)
+                </a>
+            `;
+        }} else {{
+            // --- Windows/PC用: window.open で別窓ポップアップ ---
+            container.innerHTML = `
+                <button onclick="window.open('${{url}}', '_blank', 'width=1000,height=800');"
+                   style="display:block; width:100%; background:#1a73e8; color:white; padding:15px; border-radius:12px; border:none; font-weight:bold; cursor:pointer;">
+                   ② Geminiを別画面で起動 (PC)
+                </button>
+            `;
+        }}
+        </script>
         """
-        st.components.v1.html(pwa_escape_html, height=80)
+        st.components.v1.html(device_switch_html, height=120)
