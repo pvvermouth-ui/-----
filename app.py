@@ -72,9 +72,11 @@ with st.container():
     o_input = st.text_input("アウトカム (任意): 改善したい指標（空欄で機能改善、ADL向上）", 
                           placeholder="例：歩行速度、ADL(FIM)、麻痺側使用頻度")
 
-    st.subheader("🔑 自由キーワード（高次脳・合併症など）")
+    st.subheader("🔑 自由キーワード")
     free_keywords = st.text_input("キーワード", 
                                 placeholder="例：USN、二重課題、バイオメカニクス")
+    exclude_keywords = st.text_input("除外したいキーワード", 
+                                placeholder="例：ロボット")
 
 # プロンプト生成
 if st.button("プロンプトを生成する"):
@@ -106,6 +108,7 @@ if st.button("プロンプトを生成する"):
 - **介入 (I)**: {i_input if i_input else "特定の指定なし（最新のトレンドおよび、この症例に特有の課題に対する介入を優先）"}
 - **期待する結果 (O)**: {o_input if o_input else "機能改善、ADL向上"}
 - **重要視するキーワード**: {free_keywords if free_keywords else "なし"}
+- **以下の内容は提案から完全に除外してください**：{exclude_keywords if exclude_keywords else "なし"}"
 
 # 厳守事項（ハルシネーション防止）
 1. 著者名、論文タイトル、URLは、Google検索の結果と100%一致するもののみを出力してください。
