@@ -108,7 +108,7 @@ if st.button("プロンプトを生成する"):
 - **介入 (I)**: {i_input if i_input else "特定の指定なし（最新のトレンドおよび、この症例に特有の課題に対する介入を優先）"}
 - **期待する結果 (O)**: {o_input if o_input else "機能改善、ADL向上"}
 - **重要視するキーワード**: {free_keywords if free_keywords else "なし"}
-- **以下の内容は提案から完全に除外してください**：{exclude_keywords if exclude_keywords else "なし"}"
+- **以下の内容は提案から完全に除外してください**：{exclude_keywords if exclude_keywords else "なし"}
 
 # 厳守事項（ハルシネーション防止）
 1. 著者名、論文タイトル、URLは、Google検索の結果と100%一致するもののみを出力してください。
