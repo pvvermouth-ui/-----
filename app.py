@@ -77,7 +77,9 @@ with st.container():
                                 placeholder="例：USN、二重課題、バイオメカニクス")
     exclude_keywords = st.text_input("除外したいキーワード", 
                                 placeholder="例：ロボット")
-    num_articles = st.selectbox("ピックアップする論文数", [5, 10, 15], index=0)
+    
+    st.subheader("📃 検索論文数")
+    num_articles = st.selectbox("リストアップする論文数", [5, 10, 15], index=0)
 
 # プロンプト生成
 if st.button("プロンプトを生成する"):
